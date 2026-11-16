@@ -1,49 +1,40 @@
-use axum::{Json, Router, routing::{get, post}};
-use serde::Serialize;
-use tracing::info;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use std::str::FromStr;
 
-#[derive(Serialize)]
-struct User {
-    name: String,
-    passwd: String,
-    total: u64,
-    used: u64,
-}
+use axum::{
+    Json, Router,
+    routing::{get, post},
+};
+
+use tracing::info;
+
+use crate::{log::log::init_logger, model::entity::user::User};
+
+mod database;
+mod model;
+mod log;
 
 #[tokio::main]
 async fn main() {
+    info!("Loggin init...");
+    init_logger().await;
 
-    tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::try_from_default_env()
-            .unwrap_or_else(|_| "info".into()))
-        .with(tracing_subscriber::fmt::layer())
-        .init();
-        
+    info!("Loading .env...");
+    
+
+    info!("Database init...");
+    User::init_db().await;
+    
     info!("Application is starting...");
 
     let app = Router::new()
-        .route("/health", get(|| async {
-            "Health OK!"
-        }))
-        .route("/health", post(|| async {
-            "Health OK! \n Answer Post!"
-        }))
-        .route("/user", get(|| async {
-            Json(User {
-                name: String::from("syhong"),
-                passwd: String::from("123"),
-                total: 1024,
-                used: 2,
-            })
-        }));
+        .route("/health", get(|| async { "Health OK!" }))
+        .route("/health", post(|| async { "Health OK! \n Answer Post!" }));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8001")
         .await
         .unwrap();
 
-    println!("Server is running at http://127.0.0.1:8001");
-  
-    axum::serve(listener, app).await.unwrap();
+    info!("Server is running at http://127.0.0.1:8001");
 
-} 
+    axum::serve(listener, app).await.unwrap();
+}
