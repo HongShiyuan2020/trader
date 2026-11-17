@@ -1,3 +1,5 @@
+pub mod entity;
+
 pub mod user;
 pub mod server;
 pub mod plan;

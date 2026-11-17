@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.9"
+dotenvy = "0.15.7"
 serde = "1.0.229"
 serde_json = "1.0.154"
 serde_with = "3.24.0"
