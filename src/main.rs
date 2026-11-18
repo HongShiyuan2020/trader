@@ -1,13 +1,12 @@
-use std::{env, str::FromStr};
+use std::{env};
 
 use axum::{
-    Json, Router,
+    Router,
     routing::{get, post},
 };
 
 use dotenvy::dotenv;
-use tracing::debug;
-use tracing::{field::debug, info};
+use tracing::{info};
 
 use crate::{
     handler::server_handler,
@@ -41,7 +40,6 @@ async fn main() {
     PlanNode::init_table().await.unwrap();
 
     info!("Application is starting...");
-
     let ip = env::var("IP").expect("Please setting IP in .env!");
     let port: i32 = env::var("PORT")
         .unwrap()
