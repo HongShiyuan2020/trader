@@ -5,11 +5,13 @@ use crate::{database::db::get_pool, model::entity::entity::Entity};
 pub struct User {
     pub id: i64,
     pub name: String,
-    pub uid: String,
     pub password: String,
 }
 
-impl Entity for User { 
+impl Entity for User {
+    fn table_name() -> &'static str {
+        "user"
+    }
 
     async fn init_table() -> Result<(), sqlx::Error>{
         let res = sqlx::query(
@@ -17,7 +19,6 @@ impl Entity for User {
             CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                uid TEXT NOT NULL,
                 password TEXT NOT NULL
             );
             "#
@@ -26,9 +27,8 @@ impl Entity for User {
     }
 
     async fn insert(user: &mut Self) -> Result<(), sqlx::Error> {
-        let insert_result = sqlx::query("INSERT INTO user (name, uid, password) VALUES (?, ?, ?)")
+        let insert_result = sqlx::query("INSERT INTO user (name, password) VALUES (?, ?)")
             .bind(&user.name)
-            .bind(&user.uid)
             .bind(&user.password)
             .execute(get_pool().await)
             .await?;

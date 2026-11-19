@@ -3,18 +3,22 @@ use crate::{database::db::get_pool, model::entity::entity::Entity};
 #[derive(Debug, sqlx::FromRow)]
 pub struct PlanNode {
     pub id: i64,
-    pub pid: String,
-    pub nid: String,
+    pub plan_id: i64,
+    pub node_id: i64,
 }
 
 impl Entity for PlanNode {
+    fn table_name() -> &'static str {
+        "plan_node"
+    }
+
     async fn init_table() -> Result<(), sqlx::Error> {
         sqlx::query(
             r#"
             CREATE TABLE IF NOT EXISTS plan_node (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pid TEXT NOT NULL,
-                nid TEXT NOT NULL
+                plan_id INTEGER NOT NULL,
+                node_id INTEGER NOT NULL
             );
             "#,
         )
@@ -24,9 +28,9 @@ impl Entity for PlanNode {
     }
 
     async fn insert(plan_node: &mut Self) -> Result<(), sqlx::Error> {
-        let insert_result = sqlx::query("INSERT INTO plan_node (pid, nid) VALUES (?, ?)")
-            .bind(&plan_node.pid)
-            .bind(&plan_node.nid)
+        let insert_result = sqlx::query("INSERT INTO plan_node (plan_id, node_id) VALUES (?, ?)")
+            .bind(plan_node.plan_id)
+            .bind(plan_node.node_id)
             .execute(get_pool().await)
             .await?;
         plan_node.id = insert_result.last_insert_rowid();

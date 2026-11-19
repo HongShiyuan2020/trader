@@ -49,7 +49,8 @@ async fn main() {
     let app = Router::new()
         .route("/health", get(|| async { "Health OK!" }))
         .route("/health", post(|| async { "Health OK! \n Answer Post!" }))
-        .route("/api/server/create", post(server_handler::create));
+        .route("/api/server/create", post(server_handler::create))
+        .route("/api/server/page", get(server_handler::page));
 
     let listener = tokio::net::TcpListener::bind(format!("{ip}:{port}"))
         .await

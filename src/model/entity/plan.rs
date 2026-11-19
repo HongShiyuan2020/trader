@@ -4,18 +4,20 @@ use crate::{database::db::get_pool, model::entity::entity::Entity};
 pub struct Plan {
     pub id: i64,
     pub name: String,
-    pub pid: String,
     pub total: i64,
 }
 
 impl Entity for Plan {
+    fn table_name() -> &'static str {
+        "plan"
+    }
+
     async fn init_table() -> Result<(), sqlx::Error> {
         sqlx::query(
             r#"
             CREATE TABLE IF NOT EXISTS plan (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                pid TEXT NOT NULL,
                 total INTEGER NOT NULL
             );
             "#,
@@ -26,9 +28,8 @@ impl Entity for Plan {
     }
 
     async fn insert(plan: &mut Self) -> Result<(), sqlx::Error> {
-        let insert_result = sqlx::query("INSERT INTO plan (name, pid, total) VALUES (?, ?, ?)")
+        let insert_result = sqlx::query("INSERT INTO plan (name, total) VALUES (?, ?)")
             .bind(&plan.name)
-            .bind(&plan.pid)
             .bind(plan.total)
             .execute(get_pool().await)
             .await?;
